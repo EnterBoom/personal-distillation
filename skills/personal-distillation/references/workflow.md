@@ -1,73 +1,38 @@
-# Operating workflow
+# End-to-end workflow
 
-## Contents
+## Mutation transaction
 
-1. Capture
-2. Extract
-3. Synthesize
-4. Validate
-5. Consolidate
-6. Status and recovery
+Every new source follows this order:
 
-## 1. Capture
+1. **Preflight** - Read state, status, missing items, questions, TODOs, and relevant module indexes.
+2. **Capture** - Save the source or safe reference in `10_inbox/pending/` with provenance and privacy metadata.
+3. **Classify** - Select one primary module and optional secondary modules. Use `deferred` only with a recorded reason.
+4. **Distill** - Separate observations, interpretations, judgments, validation needs, and reusable knowledge.
+5. **Stability split** - Label extracted items `stable`, `stage`, or `unconfirmed`.
+6. **Update** - Modify the smallest set of module documents; preserve conflicting or superseded claims.
+7. **Archive intake** - Move the intake to `organized/` after successful updates, otherwise keep it pending. Move low-value or out-of-scope material to `deferred/`.
+8. **Record system changes** - Append changelog, questions, TODOs, and version notes when maturity changes.
+9. **Audit** - Refresh status and missing reports using `audit_workspace.py --write`.
+10. **Report** - Name source, classification, files changed, extracted knowledge, uncertainties, and one next action.
 
-Accept a bounded source or a reference to it. Give it a stable ID and record origin, date, context, privacy, and whether the source is complete. Keep sensitive sources outside public repositories when necessary; store a reference and a safe summary instead.
+## Epistemic kernel
 
-Exit condition: the source is identifiable and its boundary is clear.
+Within the distillation step, preserve:
 
-## 2. Extract
+```text
+source -> observation -> interpretation -> judgment -> validation -> evidence -> reusable knowledge
+```
 
-Create a distillation record from the template. Extract:
+- Observation: directly supported by the source.
+- Interpretation: an explicit reading of the observation.
+- Judgment: a claim useful for decisions or future work.
+- Validation: a falsifiable action, later evidence, independent repeated occurrence, or user confirmation.
+- Reusable knowledge: a scoped claim with evidence, boundaries, counterexamples, and retrieval location.
 
-- observations directly supported by the source;
-- tensions, surprises, and recurring signals;
-- missing context;
-- interpretations labeled as interpretations.
+## Failure recovery
 
-Exit condition: fact and inference are visibly separated.
-
-## 3. Synthesize
-
-Form the smallest useful provisional judgment. Include:
-
-- the claim;
-- supporting observations;
-- plausible alternatives;
-- current confidence: low, medium, or high;
-- what evidence could change the claim.
-
-Avoid broad universal principles when the evidence supports only a local conclusion.
-
-Exit condition: one judgment is explicit and falsifiable enough to test.
-
-## 4. Validate
-
-Create an experiment that states:
-
-- action;
-- expected observable result;
-- timeframe or review trigger;
-- disconfirming result;
-- actual result, initially pending.
-
-Validation may come from deliberate experiments, later decisions, repeated independent episodes, or credible external evidence. Writing quality and agreement from the agent are not validation.
-
-Exit condition: a concrete test or evidence-gathering action exists.
-
-## 5. Consolidate
-
-During review, choose one outcome:
-
-- retain: evidence is not yet decisive;
-- revise: evidence supports a narrower or different claim;
-- reject: evidence contradicts the claim;
-- promote: repeated or meaningful evidence supports reuse.
-
-For promotion, create a principle containing scope, conditions, counterexamples, evidence links, confidence, and review date. Never delete the earlier reasoning chain.
-
-Exit condition: evidence changes the knowledge base rather than merely accumulating.
-
-## 6. Status and recovery
-
-Keep `.distill-state.json` machine-readable and `STATUS.md` human-readable. Record the current cycle and stage after every artifact change. When resuming, recommend exactly one next action based on the earliest unmet exit condition.
+- If capture succeeds but later steps fail, keep the intake in `pending/` and record the failure in TODO.
+- If a module update succeeds but the audit fails, report partial completion and rerun the audit before continuing other work.
+- If classification is ambiguous, record up to three candidates and one clarifying question; do not force a module.
+- If new evidence contradicts verified knowledge, preserve both sources, downgrade only with user confirmation, and create a decision or review record.
 

@@ -1,85 +1,107 @@
 # Personal Distillation
 
-把原始笔记、个人经历、项目材料、阅读摘录和决策记录，持续转化为可追溯的判断、可验证的假设与可复用的原则。
+把对话、经历、项目、产品、表达偏好和工作方法，持续整理成一套可追溯、可审计、可投喂给其他 AI 的个人知识库系统。
 
-Personal Distillation is a stateful AI-agent Skill for turning raw material into traceable judgments, testable hypotheses, and reusable principles.
-
-## Core workflow
+Personal Distillation is a stateful AI-agent Skill for building and maintaining a personal AI knowledge base. It combines knowledge organization with evidence-aware distillation:
 
 ```text
-source -> observation -> interpretation -> judgment -> experiment -> evidence -> principle
+Knowledge system:
+inbox -> classify -> module -> audit -> export -> acceptance test
+
+Distillation kernel:
+source -> observation -> interpretation -> judgment -> validation -> evidence -> reusable knowledge
 ```
 
-这套工作流刻意区分“材料里实际发生了什么”与“我们如何解释它”，避免把表达得很漂亮的总结误认为经过验证的认知。
+## Why this is more than note organization
 
-## What happens on first use
+The Skill maintains four independent dimensions for every knowledge document:
 
-首次触发时，Skill 会：
+- `status`: `empty`, `draft`, `usable`, or `verified`;
+- `evidence_level`: `low`, `medium`, or `high`;
+- `stability`: `stable`, `stage`, or `unconfirmed`;
+- `privacy`: `private`, `internal`, `shareable`, or `public`.
 
-1. 完整说明个人蒸馏的工作方式，以及用户与 AI 各自负责什么；
-2. 确认主要材料、输入方式、期望产物和隐私边界；
-3. 创建一个不会覆盖现有文件的状态化工作区；
-4. 带用户用一份真实材料完成首次蒸馏和验证动作；
-5. 保存当前状态，让下一次会话能够从正确阶段继续。
+A polished summary is not automatically verified knowledge. A useful document may still be stage-specific or private.
 
-初始化后的工作区：
+## The 13-module architecture
 
-```text
-.distill-state.json
-WORKFLOW.md
-STATUS.md
-inbox/
-distillations/
-experiments/
-reviews/
-principles/
-templates/
-```
+| Module | Purpose |
+|---|---|
+| `00_control` | System guide, routing, AI collaboration, status |
+| `01_profile` | Identity, direction, capabilities, preferences, boundaries |
+| `02_cases` | Resume, project evidence, outcomes, reusable cases |
+| `03_offerings` | Products, services, pricing, delivery and acceptance |
+| `04_voice` | Positive/negative samples, phrases, channels, QA |
+| `05_workflows` | Repeatable SOPs with inputs, outputs and quality rules |
+| `06_agents` | Agent roles, contracts, routing and handoffs |
+| `07_projects` | Project context, execution, results and retrospectives |
+| `08_decisions` | Changes of judgment, tradeoffs and priorities |
+| `09_tests` | Ten acceptance domains and current results |
+| `10_inbox` | Pending, organized and deferred raw material |
+| `11_exports` | Control, full and purpose-specific AI context packs |
+| `12_system` | Changelog, TODOs, missing knowledge, questions, versions |
+
+## First use
+
+The Skill does not stop after creating folders. It:
+
+1. explains the system and collects a minimal owner profile;
+2. creates the complete V0 workspace without overwriting existing files;
+3. bootstraps the system guide, owner profile, and negative-positioning documents;
+4. processes one real source through classification, module update, records, and audit;
+5. saves state so later sessions resume from the correct stage.
 
 ## Install
 
-将 [`skills/personal-distillation`](skills/personal-distillation) 复制到你的 Agent Skills 目录，并保留目录名 `personal-distillation`。
+Copy [`skills/personal-distillation`](skills/personal-distillation) into the Skills directory used by your agent environment. Keep the directory name `personal-distillation`.
 
-Codex 示例：
+Codex example:
 
 ```bash
 cp -R skills/personal-distillation ~/.codex/skills/
 ```
 
-除用于确定性初始化工作区的 Python 3 外，本 Skill 没有其他运行时依赖。
+The deterministic workspace tools require only Python 3 and the standard library.
 
 ## Start
 
 ```text
-Use $personal-distillation to initialize my workspace and guide my first complete distillation.
+Use $personal-distillation to initialize my personal AI knowledge base and guide the first complete material-ingestion cycle.
 ```
 
-也可以使用以下中文入口：
+Daily Chinese entry phrases:
 
-- `初始化蒸馏工作区`
-- `开始蒸馏`
-- `继续蒸馏`
-- `验证这条判断`
-- `复盘`
-- `状态`
-- `使用说明`
+- `整理新素材`
+- `继续整理`
+- `完善模块`
+- `检查缺口`
+- `导出投喂包`
+- `测试知识库`
 
-## Repository structure
+## Deterministic tools
 
 ```text
-skills/personal-distillation/
-├── SKILL.md
-├── agents/openai.yaml
-├── scripts/init_workspace.py
-├── references/
-└── assets/workspace-template/
+scripts/init_workspace.py     initialize the 13-module V0 workspace
+scripts/migrate_workspace.py  migrate schema v1 state safely
+scripts/create_intake.py      preserve one raw source or external reference
+scripts/archive_intake.py     archive a processed or deferred source safely
+scripts/audit_workspace.py    refresh status, gaps and maturity
+scripts/build_export.py       build purpose-specific AI context packs
 ```
+
+## Maturity
+
+- **V0**: initialized structure and system records;
+- **V1**: personally usable profile plus evidence-backed cases;
+- **V2**: offerings, voice and workflows support real work;
+- **V3**: agent-callable system with at least 8 of 10 acceptance domains passing.
+
+File existence never advances maturity by itself.
 
 ## Privacy
 
-原始材料默认保持私密，蒸馏后的产物可以选择公开。Skill 不会在未经明确授权的情况下发布或上传材料。敏感来源可以保留在仓库之外，工作区只记录引用和安全摘要。
+Raw material remains private by default. The Skill never publishes or uploads sources without explicit authorization. Sensitive sources can stay outside the workspace while governed documents retain only a safe reference.
 
 ## License
 
 [MIT](LICENSE)
-
