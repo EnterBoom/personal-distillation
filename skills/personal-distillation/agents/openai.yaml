@@ -1,0 +1,4 @@
+interface:
+  display_name: "个人蒸馏"
+  short_description: "把原始材料持续提炼为可验证、可复用的个人认知工作流"
+  default_prompt: "Use $personal-distillation to initialize my workspace and guide my first complete distillation."
