@@ -1,71 +1,80 @@
 ---
 name: personal-distillation
-description: Build and operate a stateful personal-distillation workflow that turns raw notes, experiences, decisions, project material, or reading highlights into explicit judgments, testable hypotheses, and reusable principles. Use when a user asks to initialize or deploy a personal knowledge-distillation workspace, process new source material, continue an unfinished distillation, validate or review a judgment, promote a validated insight into a principle, inspect workflow status, or learn how the personal-distillation system works. Trigger on phrases such as "个人蒸馏", "开始蒸馏", "继续蒸馏", "初始化蒸馏工作区", "验证这条判断", "复盘", "状态", or "使用说明".
+description: Build and operate a stateful personal AI knowledge-base system that captures raw material, routes it into 13 knowledge modules, separates stable facts from stage-specific and unconfirmed claims, maintains evidence and usability states, audits gaps, exports purpose-specific AI context packs, and tests system maturity from V0 to V3. Use when a user asks to initialize a personal knowledge base, organize new notes or conversations, update a profile/case/product/style/SOP/agent/project/decision module, inspect knowledge gaps or status, continue unfinished knowledge work, export a prompt or agent context pack, test whether a knowledge base is usable, or perform personal distillation. Trigger on phrases such as "个人蒸馏", "初始化知识库", "整理新素材", "开始蒸馏", "继续整理", "完善模块", "检查缺口", "导出投喂包", "测试知识库", "状态", or "使用说明".
 ---
 
 # Personal Distillation
 
-Turn lived evidence and source material into knowledge that remains traceable, testable, and reusable.
+Operate a personal knowledge system, not a folder of summaries. Preserve the chain from raw evidence to reusable knowledge while keeping the workspace usable by other AI agents.
 
-## Route the request
+## Resolve the workspace
 
-1. Resolve the target workspace from an explicit user path, otherwise use the current workspace root.
-2. Check for `<workspace>/.distill-state.json`.
-3. If it is absent, run the first-use workflow in [references/onboarding.md](references/onboarding.md).
-4. If it exists, read it together with `STATUS.md`, then route by intent:
-   - `开始蒸馏`: create a new cycle from source material.
-   - `继续蒸馏`: resume `current_cycle` at its recorded stage.
-   - `验证这条判断`: create or update an experiment.
-   - `复盘`: record evidence and decide whether to revise, reject, retain, or promote a judgment.
-   - `状态`: summarize current work and recommend exactly one next action.
-   - `使用说明`: explain the complete loop and the available phrases.
-5. Read [references/workflow.md](references/workflow.md) before creating or changing workflow artifacts.
-6. Read [references/schemas.md](references/schemas.md) when validating state or artifact structure.
+1. Use an explicit user path when provided; otherwise use the current workspace root.
+2. Check `<workspace>/.distill-state.json`.
+3. If absent, follow [references/onboarding.md](references/onboarding.md).
+4. If `schema_version` is `1`, run `scripts/migrate_workspace.py` before any other mutation.
+5. If `schema_version` is newer than supported, stop without rewriting it.
+6. Read `00_control/STATUS.md`, `12_system/MISSING.md`, and `12_system/TODO.md` before modifying knowledge.
 
-## Preserve the epistemic chain
+## Route the intent
 
-Keep these layers distinct:
+- `初始化知识库`: follow onboarding and initialize the 13-module workspace.
+- `整理新素材` or `开始蒸馏`: follow [references/ingestion.md](references/ingestion.md).
+- `继续整理`: resume `current_intake` from state and its earliest incomplete stage.
+- `完善模块`: read the target module and its specification in [references/architecture.md](references/architecture.md), then fill evidence-backed gaps.
+- `检查缺口` or `状态`: follow [references/gap-audit.md](references/gap-audit.md).
+- `导出投喂包`: follow [references/exports.md](references/exports.md).
+- `测试知识库`: follow [references/acceptance.md](references/acceptance.md).
+- `使用说明`: explain the system map, six daily entry phrases, current maturity, and exactly one next action.
+
+Read [references/governance.md](references/governance.md) before changing metadata or promoting knowledge. Read [references/workflow.md](references/workflow.md) for the full mutation transaction.
+
+## Preserve two linked systems
+
+Maintain both:
 
 ```text
-source -> observation -> interpretation -> judgment -> experiment -> evidence -> principle
+Knowledge organization:
+inbox -> classify -> module -> audit -> export -> acceptance test
+
+Epistemic distillation:
+source -> observation -> interpretation -> judgment -> validation -> evidence -> reusable knowledge
 ```
 
-- Preserve links back to source material.
-- Separate what the source says from what the user or agent infers.
-- Mark uncertainty explicitly.
-- Treat a new judgment as provisional.
-- Promote a judgment to `principles/` only after meaningful validation or repeated independent evidence.
-- Record contradictory evidence instead of smoothing it away.
+Do not collapse either chain. Module placement does not prove a claim, and a validated claim is not useful until it is retrievable from the correct module.
 
-## Initialize safely
+## Make every mutation transactional
 
-After explaining the workflow and collecting the minimal setup facts, run:
+For each accepted source:
 
-```bash
-python3 <skill-dir>/scripts/init_workspace.py \
-  --root <workspace> \
-  --focus "<primary material>" \
-  --outcome "<desired output>" \
-  --privacy "<public/private boundary>"
-```
+1. Read current status, gaps, questions, and TODOs.
+2. Preserve the raw source or a safe reference in `10_inbox/pending/`.
+3. Classify it into one or more modules and stable, stage-specific, or unconfirmed information.
+4. Update only relevant documents and preserve source references.
+5. Move the intake to `organized/` or `deferred/` with a reason.
+6. Append `12_system/CHANGELOG.md` and update questions/TODOs.
+7. Run `scripts/audit_workspace.py --write` to refresh status and gaps.
+8. Report changed files, extracted knowledge, unresolved questions, and one next action.
 
-The initializer is idempotent and must not overwrite existing files. Inspect its JSON result and report created, preserved, and failed paths accurately.
+Do not report success if file changes, system records, or the audit did not complete.
 
-Do not declare onboarding complete after creating folders. Invite the user to provide one real source and guide one complete minimum cycle through a provisional judgment and validation action.
+## Use deterministic scripts
 
-## Keep interaction progressive
+- Initialize: `scripts/init_workspace.py`
+- Migrate v1: `scripts/migrate_workspace.py`
+- Capture a source: `scripts/create_intake.py`
+- Archive a processed source: `scripts/archive_intake.py`
+- Audit status and gaps: `scripts/audit_workspace.py`
+- Build an AI context pack: `scripts/build_export.py`
 
-- Start with the map, then show only the current stage in detail.
-- Ask only for information required to advance the current stage.
-- Prefer one concrete source over broad autobiography.
-- End each stage with: artifact created, current confidence, and one next action.
-- Persist the full operating guide in `WORKFLOW.md`; do not repeatedly dump it into chat.
+Inspect each command's JSON output. Never claim a path was written when the result marks it preserved or failed.
 
-## Respect boundaries
+## Respect evidence and privacy
 
-- Never publish, upload, or expose source material without explicit authorization.
-- Do not copy secrets or sensitive raw material into a public workspace.
-- Do not invent source evidence, validation results, or confidence.
-- Do not overwrite an existing state file, workflow document, status file, or user artifact.
-- Do not treat polished wording as validation.
-
+- Never invent identity, experience, results, data, preferences, or confirmation.
+- Never promote a document to `verified` without explicit user confirmation.
+- Keep `status`, `evidence_level`, and `stability` independent.
+- Preserve contradictions and superseded decisions in history.
+- Keep private raw material out of public repositories; store a safe reference when needed.
+- Never publish or upload material without explicit authorization.
+- Do not overwrite an existing user artifact; update deliberately or create a new version.
