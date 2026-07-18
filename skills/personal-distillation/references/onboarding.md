@@ -2,63 +2,63 @@
 
 ## Goal
 
-Give the user a complete mental model, initialize a safe workspace, and finish one minimum real distillation cycle.
+Give the user a complete mental model, initialize a safe V0 workspace, and process one real source. Folder creation alone is not completed onboarding.
 
-## Stage 1: Explain the system
+## 1. Explain the system
 
-Explain these points concisely before changing files:
+Explain concisely:
 
-1. Personal distillation converts raw material into traceable judgments and reusable principles.
-2. The loop is `capture -> extract -> synthesize -> validate -> consolidate`.
-3. The user supplies lived context, corrections, and real-world evidence.
-4. The agent structures material, separates fact from inference, exposes uncertainty, and maintains artifacts.
-5. A draft judgment is not a principle until evidence supports it.
+- The system turns raw material into maintained knowledge modules that other AI agents can retrieve.
+- The operating loop is `capture -> classify -> distill -> update -> audit -> export -> test`.
+- The agent structures, traces, audits, and maintains artifacts.
+- The user supplies context, corrections, privacy boundaries, and confirmation.
+- New claims remain drafts until evidence and confirmation justify promotion.
 
-Also name the six everyday entry phrases:
+Name the six everyday phrases: `整理新素材`, `继续整理`, `完善模块`, `检查缺口`, `导出投喂包`, and `测试知识库`.
 
-- `开始蒸馏`
-- `继续蒸馏`
-- `验证这条判断`
-- `复盘`
-- `状态`
-- `使用说明`
+## 2. Collect the minimum profile
 
-## Stage 2: Collect the deployment profile
+Collect only information that changes deployment:
 
-Collect only:
+- owner or system name;
+- primary roles and current focus;
+- main material types and how sources will be supplied;
+- desired outputs and AI consumers;
+- privacy boundary and public/private workspace choice.
 
-- primary material: experiences, reading, projects, decisions, content, or mixed;
-- current source location or delivery method;
-- desired output: principles, methods, articles, decisions, or mixed;
-- privacy boundary: what may be public and what must remain private.
+Use safe defaults when requested: mixed material, manual input, reusable knowledge plus AI context packs, and private raw sources with shareable distilled outputs.
 
-If the user asks for defaults, use `mixed`, `manual input`, `reusable principles`, and `private raw sources / shareable distilled outputs`.
+## 3. Initialize V0
 
-## Stage 3: Initialize
+Run:
 
-Run `scripts/init_workspace.py` with the selected values. Summarize what it created and what it preserved. If `.distill-state.json` already exists, stop treating the session as first use and resume from its state.
+```bash
+python3 <skill-dir>/scripts/init_workspace.py \
+  --root <workspace> \
+  --owner "<name>" \
+  --focus "<current focus>" \
+  --source-method "<source method>" \
+  --outcome "<desired output>" \
+  --privacy "<privacy boundary>"
+```
 
-## Stage 4: Complete the first minimum cycle
+Report created and preserved paths accurately. V0 requires the full directory structure, control documents, status board, inbox rules, system records, and templates.
 
-Ask for one bounded source: a note, event, decision, project episode, or excerpt. Then:
+## 4. Bootstrap three control documents
 
-1. Save or reference the source in `inbox/`.
-2. Create one record in `distillations/`.
-3. Separate observations from interpretations.
-4. Form one provisional judgment with a confidence label.
-5. Define one observable validation action in `experiments/`.
-6. Update `.distill-state.json` and `STATUS.md`.
+Fill only user-confirmed information in:
 
-Do not force principle promotion in the first cycle.
+- `00_control/00_system-guide.md`;
+- `01_profile/01_about.md`;
+- `01_profile/07_not-about.md`.
 
-## Stage 5: Handoff
+Leave missing sections explicit rather than inventing completeness.
 
-Finish with:
+## 5. Process one real source
 
-- what was created;
-- the provisional judgment;
-- how it will be validated;
-- the exact phrase the user can say next.
+Ask for one bounded source. Run the full ingestion transaction through module update, system records, and audit. Define a validation action when the source produces a judgment rather than a confirmed fact.
 
-Mark `onboarding_completed` true only after the first distillation and its validation action exist.
+## 6. Complete onboarding
+
+Set `onboarding.completed` true only when one intake is organized, at least one knowledge document was updated, and the audit completed. Finish with current maturity, created knowledge, unresolved questions, and one exact next phrase.
 
